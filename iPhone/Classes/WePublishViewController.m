@@ -59,6 +59,18 @@
 	_buttons = [[NSMutableArray alloc] init];
 	_windowMode = MODE_NONE;
 	_xmlCtrl = [[XMLController alloc] init];
+
+	_showingDetail = false;
+	
+	loginUsername_ = @"";
+	loginPassword_ = @"";
+	NSString *userFile = [[NSString alloc] initWithFormat:@"%@/%@/%@", [Util getLocalDocument], XML_DIRECTORY, USER_FILENAME];
+	if ([Util isExist:userFile]) {
+		NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:userFile];
+		loginUsername_ = [[dict objectForKey:USER_NAME] retain];
+		loginPassword_ = [[dict objectForKey:USER_PASS] retain];
+	}
+	[userFile release];
 	
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	[notificationCenter addObserver:self selector:@selector(onLogoEndSelect:) name:LOGO_END_EVENT object:nil];
@@ -72,6 +84,7 @@
 	[notificationCenter addObserver:self selector:@selector(onAuthenticationSelect:) name:AUTHENTICATION_EVENT object:nil];
 	[notificationCenter addObserver:self selector:@selector(onLoginFinishSelect:) name:LOGIN_FINISH_END_EVENT object:nil];
 	[notificationCenter addObserver:self selector:@selector(onBookmarkSaveSelect:) name:BOOKMARK_SAVE_EVENT object:nil];
+	[notificationCenter addObserver:self selector:@selector(onNetworkErrorSelect:) name:NETWORK_ERROR_LOGO_EVENT object:nil];
 
 	[self initDirectory];
 	
@@ -289,14 +302,14 @@
 	[self showAlert:nil message:RELOAD_DATA_WARNING_MESSAGE btn1:@"OK" btn2:nil tag:RELOAD_DATA_ALERT_TAG];
 }
 
-- (void)updateXML:(BOOL)checlToServer{
+- (void)updateXML:(BOOL)checkToServer force:(BOOL)force {
 	_updating = YES;
 	[self networkActivityIndicator:NO];
 	[_activitiyView setHidden:NO];
 	[statusLabel_ setHidden:NO];
 	[statusLabel_ setText:STATUS_START_TO_UPDATE];
 
-	[_xmlCtrl update:UPDATE_URL checlToServer:checlToServer];
+	[_xmlCtrl update:UPDATE_URL checkToServer:checkToServer force:force];
 }
 
 // XMLの更新終了
@@ -570,6 +583,8 @@
 
 // 本の表示
 - (void)showBook:(NSUInteger)bookIndex selectPage:(NSUInteger)selectPage {
+  _showingDetail = false;
+
 	BookInfo *info = [_bookCollection getAt:bookIndex];
 
 	// Create length info of the selected book.
@@ -652,7 +667,7 @@
 		[_logoView.view removeFromSuperview];
 		[_logoView release];
 		
-		[self updateXML:NO];
+		[self updateXML:NO force:YES];
 	}
 	
 	else if ([animationID isEqualToString:CHANGE_ORIENTATION_ANIM_ID]) {
@@ -833,11 +848,16 @@
 - (void)onAuthenticationSelect:(NSNotification *)notification {
 	LoginViewCtrl *ctrl = [[LoginViewCtrl alloc] initWithNibName:@"LoginView" bundle:nil];
 	[self presentModalViewController:ctrl animated:YES];
+	[ctrl.nameTI setText:loginUsername_];
+	[ctrl.passTI setText:loginPassword_];
 	[ctrl release];
 }
 
 // Login終了
 - (void)onLoginFinishSelect:(NSNotification *)notification {
+	LoginViewCtrl *ctrl = (LoginViewCtrl *)[notification object];
+	loginUsername_ = [ctrl.nameTI.text retain];
+	loginPassword_ = [ctrl.passTI.text retain];
 	[self dismissModalViewControllerAnimated:YES];
 }
 
@@ -848,11 +868,22 @@
 	[_bookmarkDic writeToFile:_bookmarkPath atomically:NO];
 }
 
+// login.xmlが無い状態でネットワークエラーの場合
+- (void)onNetworkErrorSelect:(NSNotification *)notification {
+//	[self networkActivityIndicator:YES];
+//	[_activitiyView setHidden:YES];
+//	[self setMenuBarItems:NO list:NO buy:NO refresh:YES trash:NO];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:AUTHENTICATION_EVENT object:nil userInfo:nil];
+}
+
 // 本が選択されて詳細画面が表示
 - (void)onBookClick:(UIButton*)sender {
-	
+  if (!_showingDetail) { // 詳細画面の複数表示を防ぐ
+    _showingDetail = true;
 	_selectBookIndex = [sender tag];
 	[self showDetail:_selectBookIndex];
+  }
 }
 
 // Logoアニメーション終了
@@ -864,6 +895,7 @@
 
 // 詳細画面を消すアニメーション
 - (void)onDetailDisappearSelect:(NSNotification *)notification {
+  _showingDetail = false;
 
 	[self initAnimation:DETAIL_TO_SELECT_ANIM_ID duration:0.5f];
 	[_detailViewCtrl.view setAlpha:0];
@@ -898,7 +930,14 @@
 
 // 詳細画面から読む画面
 - (void)onDetailToReadSelect:(NSNotification *)notification {
+	BookInfo *info = [_bookCollection getAt:_selectBookIndex];
+
+	NSString *bookDir = [[NSString alloc] initWithFormat:@"%@/%@/%@", [Util getLocalDocument], BOOK_DIRECTORY, info.uuid];
+	NSArray *files = [[NSFileManager defaultManager] directoryContentsAtPath:bookDir];
+	[info setLength:[files count]];
+	[bookDir release];
 	
+	if ( info.length > 0 ) {
 	[self setMenuBarItems:NO list:YES buy:YES refresh:YES trash:YES];
 	[self releaseListView];
 	[self releaseBackground:_windowMode];
@@ -916,6 +955,7 @@
 	
 	else {
 		[self showBook:_selectBookIndex selectPage:1];
+	}
 	}
 }
 
@@ -986,7 +1026,7 @@
 - (IBAction)onMenuRefreshClick:(id)sender {
 	[self setMenuBarItems:NO list:NO buy:NO refresh:NO trash:NO];
 	[self releaseBooks:NO];
-	[self updateXML:YES];
+	[self updateXML:YES force:NO];
 }
 
 // 削除ボタンが選択されたとき
@@ -1008,7 +1048,7 @@
 	else if ([alertView tag] == RELOAD_DATA_ALERT_TAG) {
 		if (buttonIndex == 0) {
 //		if (buttonIndex == 1) {
-			[self updateXML:YES];
+			[self updateXML:YES force:YES];
 		}
 	}
 	

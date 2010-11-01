@@ -80,6 +80,7 @@
 #define LIST_TO_DETAIL_EVENT @"list_to_detail_event"     // 詳細画面から選択画面へ
 #define DETAIL_DISAPPEAR_EVENT @"detail_disappear_event" // 詳細画面を消すアニメーション開始
 #define DETAIL_TO_READ_EVENT @"detail_to_read_event"     // 詳細画面から読む画面へ
+#define NETWORK_ERROR_LOGO_EVENT @"NETWORK_ERROR_LOGO_EVENT" // login.xmlが無い状態でネットワークエラーの場合
 
 // TagID
 #define TRASH_ALERT_TAG 100
@@ -88,7 +89,7 @@
 #define BOOK_ACTIVITY_INDICATOR 200
 
 // Auth
-#define UPDATE_RETRY_COUNT 2
+#define UPDATE_RETRY_COUNT 999
 #define AUTH_USERNAME @"wpauth"
 #define AUTH_PASSWORD @"ka08tbj3hZfa"
 
@@ -100,8 +101,8 @@
 #define TRASH_WARNING_MESSAGE @"アプリに保存された本をすべて削除します。アカウントを再設定して、本を再ダウンロードできます。\nよろしいですか？"
 #define RELOAD_DATA_WARNING_MESSAGE @"ログイン画面に戻ります。"
 #define AUTHENTICATION_ERROR_MESSAGE @"認証に失敗しました。"
-#define NETWORK_ERROR_MESSAGE @"ネットワークに接続されていません。"
-#define NETWORK_ERROR_LOGO_MESSAGE @"情報が取得できません\nアプリケーションを終了して下さい。"
+#define NETWORK_ERROR_MESSAGE @"ネットワークに接続できません。"
+#define NETWORK_ERROR_LOGO_MESSAGE @"ネットワークに接続できません。\n接続できる環境で「更新」を行ってください。"
 
 #define XML_DIRECTORY @"xml"
 #define BOOK_DIRECTORY @"xml/book"

@@ -48,7 +48,7 @@
 
 - (void)loginFinish {
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-	[notificationCenter postNotificationName:LOGIN_FINISH_END_EVENT object:nil userInfo:nil];
+	[notificationCenter postNotificationName:LOGIN_FINISH_END_EVENT object:self userInfo:nil];
 }
 
 - (IBAction)onOKButton:(id)sender {
@@ -56,10 +56,19 @@
 //	NSLog(@"name: %@ pass: %@", _nameTI.text, _passTI.text);
 
 	// Save user info.
+	NSString *admitted = [[NSString alloc] initWithFormat:@"NO"];
 	NSString *save_path = [[NSString alloc] initWithFormat:@"%@/%@/%@", [Util getLocalDocument], XML_DIRECTORY, USER_FILENAME];
-	NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:_nameTI.text, USER_NAME, _passTI.text, USER_PASS, @"NO", USER_ADMITTED, nil];
+	if ([Util isExist:save_path]) {
+		[admitted release];
+		NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:save_path];
+		admitted = [[dict objectForKey:USER_ADMITTED] retain];
+		[dict release];
+	}
+	
+	NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:_nameTI.text, USER_NAME, _passTI.text, USER_PASS, admitted, USER_ADMITTED, nil];
 	[userInfo writeToFile:save_path atomically:YES];
 	[userInfo release];
+	[admitted release];
 	[save_path release];
 	
 	[self loginFinish];

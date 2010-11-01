@@ -45,9 +45,13 @@
 	NSInteger _selectBookIndex;
 	NSInteger _bookmarkPage;
 	BOOL _updating;
+	BOOL _showingDetail;
 	NSUInteger currentPage_;
 	NSUInteger updateRequestFileCount_;
 	NSUInteger updateTotalDownloadCount_;
+	
+	NSString *loginUsername_;
+	NSString *loginPassword_;
 }
 
 @property (nonatomic, retain) IBOutlet UIScrollView *scrollView;
@@ -66,7 +70,7 @@
 - (void)logoToTop;
 - (void)showAlert:(NSString *)title message:(NSString *)message btn1:(NSString *)btn1 btn2:(NSString *)btn2 tag:(NSUInteger)tag;
 - (void)trashAllData;
-- (void)updateXML:(BOOL)checlToServer;
+- (void)updateXML:(BOOL)checkToServer force:(BOOL)force;
 - (void)updateXMLFinish;
 - (void)setBooks:(BOOL)animation;
 - (void)releaseBackground:(NSInteger)windowModeType;
