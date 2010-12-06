@@ -41,7 +41,7 @@
   [_readViewACtrl.view setAlpha:0];
   [_readViewACtrl setup:_uuid selectPage:_selectPage pageNum:maxPage direction:_direction windowMode:_windowMode];
 
-  [self initAnimation:CHANGE_ORIENTATION_ANIM_ID duration:0.25f];
+  [self initAnimation:CHANGE_ORIENTATION_ANIM_ID duration:0.10f];
 
   [_readViewACtrl.view setAlpha:1];
   [UIView commitAnimations];
@@ -84,7 +84,7 @@
 
 	[_readViewACtrl.view setAlpha:0];
 	[_readViewACtrl setup:_uuid selectPage:_selectPage pageNum:maxPage direction:_direction windowMode:_windowMode];
-	[self initAnimation:CHANGE_ORIENTATION_ANIM_ID duration:0.25f];
+	[self initAnimation:CHANGE_ORIENTATION_ANIM_ID duration:0.10f];
 
 	[_readViewACtrl.view setAlpha:1];
 	[UIView commitAnimations];

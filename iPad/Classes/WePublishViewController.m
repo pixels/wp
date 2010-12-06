@@ -890,7 +890,7 @@
 - (void)onDetailDisappearSelect:(NSNotification *)notification {
   _showingDetail = false;
 
-	[self initAnimation:DETAIL_TO_SELECT_ANIM_ID duration:0.5f];
+	[self initAnimation:DETAIL_TO_SELECT_ANIM_ID duration:0.4f];
 	[_detailViewCtrl.view setAlpha:0];
 	CGRect frame = _detailViewCtrl.view.frame;
 	frame.size.width = 0;

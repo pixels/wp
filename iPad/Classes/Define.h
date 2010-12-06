@@ -47,7 +47,7 @@
 
 // Set speed of curling page
 #define CURL_BOOST_MODE_A 1.20f
-#define CURL_BOOST_MODE_B 2.00f
+#define CURL_BOOST_MODE_B 1.65f
 
 // Max scale
 #define MAX_ZOOM_SCALE 1.0f

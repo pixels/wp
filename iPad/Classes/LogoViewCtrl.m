@@ -20,13 +20,13 @@
     [super viewDidLoad];
 	[_logoView setAlpha:0.0f];
 	
-	[self initAnimation:ANIMATION_START duration:1.0f delay:1.0f];
+	[self initAnimation:ANIMATION_START duration:0.75f delay:0.75f];
 	[_logoView setAlpha:1.0f];
 	[UIView commitAnimations];
 }
 
 - (void)requestEnd {
-	[self initAnimation:ANIMATION_END duration:0.5f delay:0.0f];
+	[self initAnimation:ANIMATION_END duration:0.75f delay:0.0f];
 	[_logoView setAlpha:0.0f];
 	[UIView commitAnimations];
 }
